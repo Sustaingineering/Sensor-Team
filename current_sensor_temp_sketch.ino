@@ -64,8 +64,8 @@ void Temp_Sensor(){
   if(voltage > 2500)
   {
      volt = voltage-2500;//(while cold conjuction is 22 degree 
-     volt =  volt / 123; //(opamp apmplified 150 times)
-     temp = (volt)/0.041 + 25  ;//( 1 degree = 0.0404 mv in K type )
+     volt =  volt / 123; //(opamp apmplified 123 times)
+     temp = (volt)/0.041 + 20  ;//( 1 degree = 0.0404 mv in K type )
   }
        
   else{
@@ -73,7 +73,7 @@ void Temp_Sensor(){
                              //   the voltage cross thermalcouple is 1.67v) 
      volt =  volt / 123; //(opamp apmplified 150 times)
         
-     temp = 25-(volt)/0.0404  ;//( 1 degree = 0.0404 mv in K type )
+     temp = 20-(volt)/0.0404  ;//( 1 degree = 0.0404 mv in K type )
   
   }
   
