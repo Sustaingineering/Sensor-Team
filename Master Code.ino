@@ -21,7 +21,7 @@
       pin 2 - Arduino ON/OFF
       pin 3 - Voltage reading
       pin 5 - Current reading
-      pin X - Realy Open/Close
+      pin X - Relay Open/Close
 */
 
 
