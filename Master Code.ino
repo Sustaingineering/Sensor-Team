@@ -8,20 +8,20 @@
   // Temperature Sensor circuit
       A2 - Temperature sensor
 
-  // SD Card SPI bus circuit
+  // SD Card Module SPI bus circuit
       pin 11 - MOSI
       pin 12 - MISO
       pin 13 - CLK
       pin 4 - CS (depends on your SD card shield or module, 4 used here)
 
   // Relay circuit
-      pin 6 - Relay test signal
+      pin 6 - Relay PWM pin
 
   // LED Test Interface
       pin 2 - Arduino ON/OFF
       pin 3 - Voltage reading
       pin 5 - Current reading
-      pin 6 - Realy Open/Close
+      pin X - Realy Open/Close
 */
 
 
@@ -93,7 +93,7 @@ void setup() {
 
 
 void loop() {
-  // Smth ...
+  // will change after adding timer circuit
   Time = millis();
 
   /* Current Sensor */
@@ -114,7 +114,7 @@ void loop() {
   /* Data Logging */
   SDLog();
 
-  // 1 second delay
+  // 1 second delay?? - make saving to SD avg every 10s - + threshhold count
   delay(1000);
 }
 
@@ -234,7 +234,7 @@ void SDLog() {
     myFile.print("\t Panel Current = ");
     myFile.print(HallAmps);
 
-    // Record temperature
+    // Record temperature (may add another)
     myFile.print("\t Panel Temperature = ");
     myFile.println(Temp);
 
