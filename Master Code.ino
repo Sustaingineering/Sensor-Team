@@ -22,12 +22,22 @@
       pin 3 - Voltage reading
       pin 5 - Current reading
       pin X - Relay Open/Close
+
+  // DS3231 attached to Arduino as follows:
+      GND - GND on Arduino
+      VCC - 5V on Arduino
+      SDA - A4 on Arduino
+      SCL - A5 on Arduino
 */
 
 
 // Header files
 #include <SPI.h>
 #include <SD.h>
+#include <Wire.h>
+#include "DS3231.h"
+
+RTClib RTC;
 
 
 // Declare all global variables
@@ -62,6 +72,7 @@ double RL = 24783;    // Voltage Divider Low Resistance
 // Setup Function
 void setup() {
   Serial.begin(9600);             // Setup Baud rate
+  Wire.begin();
 
   // Setup for Voltage Sensor
   HallValue1 = analogRead(A0);     // Take one initial voltage reading
@@ -94,7 +105,8 @@ void setup() {
 
 void loop() {
   // will change after adding timer circuit
-  Time = millis();
+
+  DateTime now = RTC.now();
 
   /* Current Sensor */
   HallEffect();
@@ -167,6 +179,20 @@ void Thermolcouple() {
 
 // Display Results
 void DisplayResults() {
+  // Accurate time from DS3231 timer
+  Serial.print("Time = " );
+  Serial.print(now.year(), DEC);
+  Serial.print('/');
+  Serial.print(now.month(), DEC);
+  Serial.print('/');
+  Serial.print(now.day(), DEC);
+  Serial.print(' ');
+  Serial.print(now.hour(), DEC);
+  Serial.print(':');
+  Serial.print(now.minute(), DEC);
+  Serial.print(':');
+  Serial.print(now.second(), DEC);
+
   // Voltage divider voltage
   Serial.print("Divider Node Voltage = ");
   Serial.print(DivVoltage,3);
@@ -210,13 +236,23 @@ void LEDInterface() {
 void SDLog() {
   // Open test file
   // The file name testNUM is the text file we write to
-  myFile = SD.open("test155.txt", FILE_WRITE);
+  myFile = SD.open("test158.txt", FILE_WRITE);
 
   // if the file opened okay, write to it
   if (myFile) {
     // Record time
     myFile.print("Time (s) = ");
-    myFile.print(Time/1000);
+    myFile.print(now.year(), DEC);
+    myFile.print('/');
+    myFile.print(now.month(), DEC);
+    myFile.print('/');
+    myFile.print(now.day(), DEC);
+    myFile.print(' ');
+    myFile.print(now.hour(), DEC);
+    myFile.print(':');
+    myFile.print(now.minute(), DEC);
+    myFile.print(':');
+    myFile.print(now.second(), DEC);
 
     // Record divider voltage
     myFile.print("\t Divider Node Voltage = ");
