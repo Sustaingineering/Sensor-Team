@@ -36,9 +36,6 @@
     double SourceVoltage = 0;        // Final voltage reading result
 
   // Current Sensor
-    double HallValue1 = 0;     // Variables for current running average
-    double HallValue2 = 0;
-    double HallValue3 = 0;
     double HallVoltage = 0;   // Voltage reading of Hall Effect
     double HallAmps = 0;      // Current result from Hall Effect Sensor
 
@@ -55,17 +52,13 @@
 
 
 // Declare any global constants
-double RH = 969000;   // Voltage Divider High Resistance
-double RL = 24783;    // Voltage Divider Low Resistance
+double RH = 983000;   // Voltage Divider High Resistance
+double RL = 24790;    // Voltage Divider Low Resistance
 
 
 // Setup Function
 void setup() {
   Serial.begin(9600);             // Setup Baud rate
-
-  // Setup for Voltage Sensor
-  HallValue1 = analogRead(A0);     // Take one initial voltage reading
-  HallValue2 = analogRead(A0);     // Take second initial voltage reading
 
   // Data Logging setup
   while (!Serial) {
@@ -121,7 +114,8 @@ void loop() {
 // Voltage Divider Sensor
 void VoltageDivider() {
   // Read Voltage at divider and convert to decimal
-  DivVoltage = ((analogRead(A1)) / 1023.0) * 5;
+  int x = analogRead(A1);
+  DivVoltage = x * (5.0/1023.0);
 
   // Final Source Voltage reading
   SourceVoltage = (DivVoltage * (RH + RL)) / RL;
@@ -129,15 +123,10 @@ void VoltageDivider() {
 
 // Hall Effect sensor
 void HallEffect() {
-  HallValue3 = HallValue2;         // Take reading at time index (n-2)
-  HallValue2 = HallValue1;         // Take reading at time index (n-1)
-  HallValue1 = analogRead(A0);     // Take reading at time index (n)
-
-  // Take running average
-  HallVoltage = (HallValue1 + HallValue2 + HallValue3) / 3;
+  int x = analogRead(A0);     // Take reading
 
   // Convert to decimal
-  HallVoltage = (HallVoltage / 1023.0) * 5;
+  HallVoltage = x * (5.0/1023.0);
 
   // Compute the current from the voltage reading
   // Equation: ...
@@ -147,7 +136,8 @@ void HallEffect() {
 // Thermolcouple sensor
 void Thermolcouple() {
   // Read sensor value and convert to mV
-  TempVolt = (analogRead(A2) * 5000) / 1023 + 25;
+  int x = analogRead(A2);
+  TempVolt = x * (5000.0/1023.0) + 25;
 
   // Check if upper voltage bound
   if(TempVolt > 2500) {
@@ -168,7 +158,7 @@ void Thermolcouple() {
 // Display Results
 void DisplayResults() {
   // Voltage divider voltage
-  Serial.print("Divider Node Voltage = ");
+  Serial.print("Divider Voltage = ");
   Serial.print(DivVoltage,3);
 
   // Panel voltage Result
@@ -176,7 +166,7 @@ void DisplayResults() {
   Serial.print(SourceVoltage,3);
 
   // Hall Effect voltage reading
-  Serial.print("\t Hall Effect Voltage = ");
+  Serial.print("\t Hall Voltage = ");
   Serial.print(HallVoltage,3);
 
   // Current reading
@@ -219,7 +209,7 @@ void SDLog() {
     myFile.print(Time/1000);
 
     // Record divider voltage
-    myFile.print("\t Divider Node Voltage = ");
+    myFile.print("\t Divider Voltage = ");
     myFile.print(DivVoltage);
 
     // Record panel voltage
@@ -227,7 +217,7 @@ void SDLog() {
     myFile.print(SourceVoltage);
 
     // Record hall effect voltage signal
-    myFile.print("\t Hall Effect Voltage = ");
+    myFile.print("\t Hall Voltage = ");
     myFile.print(HallVoltage);
 
     // Record panel current
