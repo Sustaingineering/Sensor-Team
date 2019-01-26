@@ -27,8 +27,12 @@
 
 // Header files
 #include <SPI.h>
-#include <SD.h>
+#include "SdFat.h"
+#include <Wire.h>
+#include "DS3231.h"
 
+RTClib RTC;
+SdFat SD;
 
 // Declare all global variables
   // Volatge Sensor
@@ -59,6 +63,7 @@ double RL = 24790;    // Voltage Divider Low Resistance
 // Setup Function
 void setup() {
   Serial.begin(9600);             // Setup Baud rate
+  Wire.begin();
 
   // Data Logging setup
   while (!Serial) {
@@ -88,6 +93,7 @@ void setup() {
 void loop() {
   // will change after adding timer circuit
   Time = millis();
+
 
   /* Current Sensor */
   HallEffect();
@@ -200,13 +206,24 @@ void LEDInterface() {
 void SDLog() {
   // Open test file
   // The file name testNUM is the text file we write to
-  myFile = SD.open("test155.txt", FILE_WRITE);
+  myFile = SD.open("timertestreal2.txt", FILE_WRITE);
 
   // if the file opened okay, write to it
   if (myFile) {
     // Record time
+     DateTime now = RTC.now();
     myFile.print("Time (s) = ");
-    myFile.print(Time/1000);
+    myFile.print(now.year(), DEC);
+    myFile.print('/');
+    myFile.print(now.month(), DEC);
+    myFile.print('/');
+    myFile.print(now.day(), DEC);
+    myFile.print(' ');
+    myFile.print(now.hour(), DEC);
+    myFile.print(':');
+    myFile.print(now.minute(), DEC);
+    myFile.print(':');
+    myFile.print(now.second(), DEC);
 
     // Record divider voltage
     myFile.print("\t Divider Voltage = ");
@@ -232,7 +249,7 @@ void SDLog() {
     myFile.close();
   } else {
     // if the file didn't open, print an error:
-    Serial.println("error opening test.txt");
+    Serial.println("error opening timertest3.txt");
   }
 
   /* \\ this code will read the data just stored on the SD Card, ensure file names match
