@@ -60,8 +60,8 @@ SdFat SD;
 
 
 // Declare any global constants
-double RH = 24743.0;   // Voltage Divider High Resistance
-double RL = 981300.0;    // Voltage Divider Low Resistance
+double RH = 981300;   // Voltage Divider High Resistance
+double RL = 24743;    // Voltage Divider Low Resistance
 
 
 // Setup Function
@@ -137,7 +137,7 @@ void HallEffect() {
 
   // Compute the current from the voltage reading
   // Equation: ...
-  HallAmps = (HallVoltage / 0.13720695) - (2.51 / 0.13720695);
+  HallAmps = (HallVoltage * 22.0)/3.0 - (55.0 / 3.0);
 }
 
 // Thermolcouple sensor
@@ -193,10 +193,10 @@ void LEDInterface() {
   digitalWrite(5,LOW);        // Current light
   digitalWrite(7,LOW);        // Relay light
 
-  if(SourceVoltage > 0)
+  if(SourceVoltage > 1)
     digitalWrite(3,HIGH);
 
-  if(HallAmps > 0)
+  if(HallAmps > 0.5)
     digitalWrite(5, HIGH);
 
   if(RelayTest == 1)
@@ -207,7 +207,7 @@ void LEDInterface() {
 void SDLog() {
   // Open test file
   // The file name testNUM is the text file we write to
-  myFile = SD.open("timertestreal2.txt", FILE_WRITE);
+  myFile = SD.open("timertestreal8.txt", FILE_WRITE);
 
   // if the file opened okay, write to it
   if (myFile) {
@@ -250,7 +250,7 @@ void SDLog() {
     myFile.close();
   } else {
     // if the file didn't open, print an error:
-    Serial.println("error opening timertest3.txt");
+    Serial.println("error opening timertest8.txt");
   }
 
   /* \\ this code will read the data just stored on the SD Card, ensure file names match
