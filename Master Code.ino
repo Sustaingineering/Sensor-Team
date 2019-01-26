@@ -17,11 +17,15 @@
   // Relay circuit
       pin 6 - Relay PWM pin
 
+  // Timer pins
+      A4 - SDA
+      A5 - SCL
+
   // LED Test Interface
       pin 2 - Arduino ON/OFF
       pin 3 - Voltage reading
       pin 5 - Current reading
-      pin X - Relay Open/Close
+      pin 7 - Relay Open/Close
 */
 
 
@@ -56,8 +60,8 @@ SdFat SD;
 
 
 // Declare any global constants
-double RH = 983000;   // Voltage Divider High Resistance
-double RL = 24790;    // Voltage Divider Low Resistance
+double RH = 24743.0;   // Voltage Divider High Resistance
+double RL = 981300.0;    // Voltage Divider Low Resistance
 
 
 // Setup Function
@@ -86,15 +90,12 @@ void setup() {
   pinMode(2,OUTPUT);    // Arduino On LED
   pinMode(3,OUTPUT);    // Voltage LED
   pinMode(5,OUTPUT);    // Current LED
-  pinMode(6,OUTPUT);    // Relay Open/Close
+  pinMode(7,OUTPUT);    // Relay Open/Close
+  pinMode(6,INPUT);
 }
 
 
 void loop() {
-  // will change after adding timer circuit
-  Time = millis();
-
-
   /* Current Sensor */
   HallEffect();
 
@@ -190,7 +191,7 @@ void LEDInterface() {
   digitalWrite(2,HIGH);       // Arduino on light
   digitalWrite(3,LOW);        // Voltage light
   digitalWrite(5,LOW);        // Current light
-  digitalWrite(6,LOW);        // Relay light
+  digitalWrite(7,LOW);        // Relay light
 
   if(SourceVoltage > 0)
     digitalWrite(3,HIGH);
@@ -199,7 +200,7 @@ void LEDInterface() {
     digitalWrite(5, HIGH);
 
   if(RelayTest == 1)
-    digitalWrite(6,HIGH);
+    digitalWrite(7,HIGH);
 }
 
 // Log Results on SD
