@@ -12,10 +12,10 @@
       pin 11 - MOSI
       pin 12 - MISO
       pin 13 - CLK
-      pin 4 - CS (depends on your SD card shield or module, 4 used here)
+      pin 10 - CS (depends on your SD card shield or module, 4 used here)
 
   // Relay circuit
-      pin 6 - Relay PWM pin
+      pin 9 - Relay PWM pin
 
   // Timer pins
       A4 - SDA
@@ -25,7 +25,7 @@
       pin 2 - Arduino ON/OFF
       pin 3 - Voltage reading
       pin 5 - Current reading
-      pin 7 - Relay Open/Close
+      pin 7 - Relay Open/Close LED
 */
 
 
@@ -66,7 +66,7 @@ double RL = 24743;    // Voltage Divider Low Resistance
 
 // Setup Function
 void setup() {
-  Serial.begin(9600);             // Setup Baud rate
+  Serial.begin(4800);             // Setup Baud rate
   Wire.begin();
 
   // Data Logging setup
@@ -76,7 +76,7 @@ void setup() {
 
   Serial.print("Initializing SD card...");
 
-  if (!SD.begin(4)) {
+  if (!SD.begin(10)) {
     Serial.println("initialization failed!");
     while (1);
   }
@@ -90,8 +90,8 @@ void setup() {
   pinMode(2,OUTPUT);    // Arduino On LED
   pinMode(3,OUTPUT);    // Voltage LED
   pinMode(5,OUTPUT);    // Current LED
-  pinMode(7,OUTPUT);    // Relay Open/Close
-  pinMode(6,INPUT);
+  pinMode(7,OUTPUT);    // Relay Open/Close LED
+  pinMode(9,OUTPUT);    // Relay Control Pin
 }
 
 
@@ -101,6 +101,9 @@ void loop() {
 
   /* Voltage Divider */
   VoltageDivider();
+
+  /* Relay */
+  RelaySwitch();
 
   /* Temperature Sensor */
   Thermolcouple();
@@ -169,7 +172,7 @@ void DisplayResults() {
   Serial.print(DivVoltage,3);
 
   // Panel voltage Result
-  Serial.print("\t Panel Voltage = ");
+  Serial.print("\t Source Voltage = ");
   Serial.print(SourceVoltage,3);
 
   // Hall Effect voltage reading
@@ -184,10 +187,23 @@ void DisplayResults() {
   Serial.print("\t Panel Temperature = ");
   Serial.println(Temp);
 }
+// Relay Control
+void RelaySwitch(){
+
+  if(HallAmps > 1 || SourceVoltage > 1){
+  analogWrite(9,255);
+  }
+  else{
+  analogWrite(9,30);
+  }
+}
 
 // LED Interface
 void LEDInterface() {
-  RelayTest = digitalRead(6); // Checks if relay is closed
+  RelayTest = analogRead(9); // Checks if relay is closed
+  Serial.print("\n Relay Test: ");
+  Serial.print(RelayTest);
+  Serial.print("\n");
   digitalWrite(2,HIGH);       // Arduino on light
   digitalWrite(3,LOW);        // Voltage light
   digitalWrite(5,LOW);        // Current light
@@ -199,7 +215,7 @@ void LEDInterface() {
   if(HallAmps > 0.5)
     digitalWrite(5, HIGH);
 
-  if(RelayTest == 1)
+  if(RelayTest > 3)
     digitalWrite(7,HIGH);
 }
 
@@ -207,7 +223,7 @@ void LEDInterface() {
 void SDLog() {
   // Open test file
   // The file name testNUM is the text file we write to
-  myFile = SD.open("timertestreal8.txt", FILE_WRITE);
+  myFile = SD.open("timertestreal15.txt", FILE_WRITE);
 
   // if the file opened okay, write to it
   if (myFile) {
@@ -222,8 +238,14 @@ void SDLog() {
     myFile.print(' ');
     myFile.print(now.hour(), DEC);
     myFile.print(':');
+    if(now.minute() < 10){
+      myFile.print('0');
+    }
     myFile.print(now.minute(), DEC);
     myFile.print(':');
+    if(now.second() < 10){
+      myFile.print('0');
+    }
     myFile.print(now.second(), DEC);
 
     // Record divider voltage
@@ -231,7 +253,7 @@ void SDLog() {
     myFile.print(DivVoltage);
 
     // Record panel voltage
-    myFile.print("\t Panels Voltage = ");
+    myFile.print("\t Source Voltage = ");
     myFile.print(SourceVoltage);
 
     // Record hall effect voltage signal
@@ -250,13 +272,13 @@ void SDLog() {
     myFile.close();
   } else {
     // if the file didn't open, print an error:
-    Serial.println("error opening timertest8.txt");
+    Serial.println("error opening timertest10.txt");
   }
 
   /* \\ this code will read the data just stored on the SD Card, ensure file names match
-  myFile = SD.open("test151.txt");
+  myFile = SD.open("timertest8.txt");
   if (myFile) {
-    Serial.println("test151.txt:");
+    Serial.println("timertest8.txt:");
 
     // read from the file until there's nothing else in it:
     while (myFile.available()) {
